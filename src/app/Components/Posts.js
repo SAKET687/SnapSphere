@@ -189,7 +189,7 @@ const Posts = ({ commentData }) => {
                                             <td>Like(s)</td>
                                             <td>
                                                 <span>{selectedPost.no_likes}</span>
-                                                <button style={{ margin: "5px", }} onClick={() => handleLike(selectedPost.post_id)}>
+                                                <button style={{ margin: "7px", }} onClick={() => handleLike(selectedPost.post_id)}>
                                                     <Image style={{ height: '15px', width: "15px" }} src={selectedPost.liked ? like_after : like_before} alt="like" />
                                                 </button>
                                             </td>
