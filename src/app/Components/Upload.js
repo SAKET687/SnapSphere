@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import supabase from '../../../Database/supabase';
-import { useNavigate } from "react-router-dom";
 import "./Components.css";
 
 const Upload = ({ closeUploadPopup }) => {
-    const navigate = useNavigate();
     const [description, setDescription] = useState('');
     const [file, setFile] = useState(null);
     const [message, setMessage] = useState('');
@@ -15,17 +13,26 @@ const Upload = ({ closeUploadPopup }) => {
             return;
         }
 
+        function generateRandomAlphaNumeric(length) {
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                result += charset[randomIndex];
+            }
+            return result;
+        }
+
+        const rs1 = generateRandomAlphaNumeric(10);
+        const rs2 = generateRandomAlphaNumeric(5);
+        const fileName = `${rs1}_${rs2}`;
         try {
-            const { data, error } = await supabase.storage.from('snapsphere_images').upload(`public/${file.name}`, file, {
+            const { data, error } = await supabase.storage.from('snapsphere_images').upload(`public/${fileName}`, file, {
                 cacheControl: '3600',
                 upsert: false,
             });
-            if (error) {
-                throw error;
-            }
-            const file_name = file.name;
-
-            // Add post to the database
+            console.log(data);
+            const file_name = fileName;
             const { data: postData, error: postError } = await supabase
                 .from('snap_post')
                 .insert([{
@@ -35,11 +42,12 @@ const Upload = ({ closeUploadPopup }) => {
             if (postError) {
                 throw postError;
             }
-
             setMessage("Post uploaded successfully!");
-            setDescription(''); 
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+            setDescription('');
             setFile(null);
-            navigate('/');
         } catch (error) {
             console.error('Error uploading post:', error.message);
             setMessage("An error occurred while uploading the post.");
@@ -69,7 +77,7 @@ const Upload = ({ closeUploadPopup }) => {
                         <div className="product-field">
                             <div className="product-label">Description:</div>
                             <div className="product-div">
-                                <textarea placeholder='Enter description........ (optional)' value={description} onChange={(e) => setDescription(e.target.value)} className="form-control" rows="4" />
+                                <textarea placeholder='Enter description/caption........ (optional)' value={description} onChange={(e) => setDescription(e.target.value)} className="form-control" rows="4" />
                             </div>
                         </div>
 
