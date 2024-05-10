@@ -1,16 +1,15 @@
-import express from 'express';
-import { createServer } from 'http';
-import socketIo from 'socket.io';
-import { createClient } from '@supabase/supabase-js';
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-const server = createServer(app);
+const server = http.createServer(app);
 const io = socketIo(server);
 
 const supabaseUrl = "https://dytpynmiajyukcncmcrf.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dHB5bm1pYWp5dWtjbmNtY3JmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxNTI4MzkxMiwiZXhwIjoyMDMwODU5OTEyfQ.ZrCMuvHXIIG8FDkk4qNvhHCP7OU-GIOTJ9SNr9Pwt0c";
 const supabase = createClient(supabaseUrl, supabaseKey);
-
 
 io.on('connection', (socket) => {
     console.log('A client connected');
@@ -19,7 +18,7 @@ io.on('connection', (socket) => {
         try {
             const { data, error } = await supabase
                 .from('snap_post')
-                .update({ no_likes: supabase.sql('no_likes + 1') })
+                .update({ no_likes: supabase.increment('no_likes', 1) })
                 .eq('post_id', postId)
                 .single();
 
